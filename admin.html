@@ -222,6 +222,16 @@
     font-weight: 700;
     font-size: 13px;
   }
+  .dist-empty {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 500;
+    font-style: italic;
+  }
   .dist-count {
     text-align: left;
     color: #64748b;
@@ -289,24 +299,31 @@
     gap: 6px;
     flex-wrap: wrap;
   }
-  .icon-btn {
-    width: 34px;
-    height: 34px;
+  .action-btn {
+    padding: 6px 12px;
     border-radius: 8px;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
     transition: all 0.15s;
     text-decoration: none;
+    white-space: nowrap;
+    min-width: 50px;
   }
-  .icon-btn:hover { transform: scale(1.05); }
-  .icon-btn.view { background: #eff6ff; color: #1d4ed8; }
-  .icon-btn.pdf { background: #fef2f2; color: #dc2626; }
-  .icon-btn.docx { background: #eff6ff; color: #2563eb; }
-  .icon-btn.answer { background: #fef3c7; color: #92400e; }
+  .action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+  .view-btn   { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+  .view-btn:hover { background: #ddd6fe; }
+  .pdf-btn    { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+  .pdf-btn:hover { background: #fecaca; }
+  .word-btn   { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+  .word-btn:hover { background: #bfdbfe; }
+  .answer-btn { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .answer-btn:hover { background: #fde68a; }
 
   /* Modal */
   .modal-overlay {
@@ -540,6 +557,31 @@
     white-space: nowrap;
     text-align: center;
   }
+  .desktop-only { display: block; }
+  .mobile-only { display: none; }
+  .student-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .student-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    gap: 10px;
+  }
+  .student-card-name { font-weight: 700; font-size: 14px; color: #0f172a; }
+  .student-card-uid { font-size: 11px; color: #94a3b8; direction: ltr; display: inline-block; margin-top: 2px; }
+  .student-card-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 12px;
+  }
+  .student-card-label { color: #64748b; font-weight: 500; }
   .activity-table {
     width: 100%;
     border-collapse: collapse;
@@ -641,6 +683,8 @@
   }
 
   @media (max-width: 768px) {
+    .desktop-only { display: none; }
+    .mobile-only { display: block; }
     .login-card { padding: 32px 22px; max-width: 92%; }
     .login-card h1 { font-size: 20px; }
     .login-card .subtitle { font-size: 13px; margin-bottom: 22px; }
@@ -670,7 +714,7 @@
     .students-table td, .students-table th { padding: 8px 4px; }
     .students-table .rank { width: 30px; height: 30px; font-size: 11px; }
     .actions-cell { flex-wrap: nowrap; }
-    .icon-btn { width: 30px; height: 30px; font-size: 12px; }
+    .action-btn { padding: 5px 8px; font-size: 11px; min-width: 40px; }
     .modal-overlay { padding: 8px; }
     .modal { border-radius: 14px; }
     .modal-header { padding: 18px 20px; }
@@ -1040,14 +1084,16 @@ function renderActivity() {
   }
 
   html += '<div class="activity-section"><h3>نشاط كل طالب</h3>';
-  html += '<div style="overflow-x:auto;"><table class="activity-table"><thead><tr>';
-  html += '<th>الطالب</th><th>الرقم</th><th>عدد المرات</th><th>اول دخول</th><th>اخر دخول</th><th>الجهاز</th><th>المتصفح</th>';
-  html += '</tr></thead><tbody>';
   studentsArr.sort((a, b) => {
     if (a.count === 0 && b.count > 0) return 1;
     if (b.count === 0 && a.count > 0) return -1;
     return b.count - a.count;
   });
+
+  // Desktop view: table
+  html += '<div class="desktop-only" style="overflow-x:auto;"><table class="activity-table"><thead><tr>';
+  html += '<th>الطالب</th><th>الرقم</th><th>عدد المرات</th><th>اول دخول</th><th>اخر دخول</th><th>الجهاز</th><th>المتصفح</th>';
+  html += '</tr></thead><tbody>';
   studentsArr.forEach(p => {
     const s = p.student;
     if (p.count > 0) {
@@ -1069,7 +1115,35 @@ function renderActivity() {
       '</tr>';
     }
   });
-  html += '</tbody></table></div></div>';
+  html += '</tbody></table></div>';
+
+  // Mobile view: cards
+  html += '<div class="mobile-only">';
+  studentsArr.forEach(p => {
+    const s = p.student;
+    if (p.count > 0) {
+      html += '<div class="student-card">' +
+        '<div class="student-card-head">' +
+          '<div><div class="student-card-name">' + s.display_name + '</div>' +
+          '<div class="student-card-uid">' + s.uid + '</div></div>' +
+          '<span class="badge-success">' + p.count + ' مرة</span>' +
+        '</div>' +
+        '<div class="student-card-row"><span class="student-card-label">اول دخول:</span><span>' + fmtDateTime(p.first) + '</span></div>' +
+        '<div class="student-card-row"><span class="student-card-label">اخر دخول:</span><span>' + fmtDateTime(p.last) + '</span></div>' +
+        '<div class="student-card-row"><span class="student-card-label">الجهاز:</span><span>' + Array.from(p.devices).map(d => '<span class="badge-device">' + deviceLabel(d) + '</span>').join(' ') + '</span></div>' +
+        '<div class="student-card-row"><span class="student-card-label">المتصفح:</span><span>' + Array.from(p.browsers).map(b => '<span class="badge-device">' + b + '</span>').join(' ') + '</span></div>' +
+      '</div>';
+    } else {
+      html += '<div class="student-card" style="opacity:0.65;">' +
+        '<div class="student-card-head">' +
+          '<div><div class="student-card-name">' + s.display_name + '</div>' +
+          '<div class="student-card-uid">' + s.uid + '</div></div>' +
+          '<span class="badge-not-yet">لم يدخل</span>' +
+        '</div></div>';
+    }
+  });
+  html += '</div>';
+  html += '</div>';
 
   const absentList = studentsArr.filter(p => p.count === 0);
   if (absentList.length > 0) {
@@ -1152,14 +1226,22 @@ function initDashboard() {
     const row = document.createElement('div');
     row.className = 'dist-row';
     const pct = (t.count / maxC) * 100;
-    row.innerHTML =
-      '<div class="dist-label">' + t.name + '</div>' +
-      '<div class="dist-bar"><div class="dist-fill" style="width:0%;background:' + t.color + ';">' + (t.count > 0 ? t.count : '') + '</div></div>' +
-      '<div class="dist-count">' + t.count + ' / ' + count + '</div>';
-    dc.appendChild(row);
-    setTimeout(() => {
-      row.querySelector('.dist-fill').style.width = pct + '%';
-    }, 100);
+    if (t.count === 0) {
+      row.innerHTML =
+        '<div class="dist-label" style="color:#94a3b8;">' + t.name + '</div>' +
+        '<div class="dist-bar"><div class="dist-empty">لا يوجد</div></div>' +
+        '<div class="dist-count" style="color:#cbd5e1;">' + t.count + ' / ' + count + '</div>';
+      dc.appendChild(row);
+    } else {
+      row.innerHTML =
+        '<div class="dist-label">' + t.name + '</div>' +
+        '<div class="dist-bar"><div class="dist-fill" style="width:0%;background:' + t.color + ';">' + t.count + '</div></div>' +
+        '<div class="dist-count">' + t.count + ' / ' + count + '</div>';
+      dc.appendChild(row);
+      setTimeout(() => {
+        row.querySelector('.dist-fill').style.width = pct + '%';
+      }, 100);
+    }
   });
 
   renderTable();
@@ -1209,10 +1291,10 @@ function renderTable() {
       '<td style="font-weight:900;">' + s.percent.toFixed(1) + '%</td>' +
       '<td><span class="tier-pill" style="background:' + s.tier_color + '">' + s.tier + '</span></td>' +
       '<td><div class="actions-cell">' +
-        '<button class="icon-btn view" onclick="showStudent(\'' + s.uid + '\')" title="عرض التفاصيل">👁</button>' +
-        '<a href="reports/' + s.uid + '_report.pdf" download class="icon-btn pdf" title="تحميل PDF">📄</a>' +
-        '<a href="reports/' + s.uid + '_report.docx" download class="icon-btn docx" title="تحميل Word">📝</a>' +
-        '<a href="reports/' + s.uid + '_answer.pdf" download class="icon-btn answer" title="ورقة الاجابة">📋</a>' +
+        '<button class="action-btn view-btn" onclick="showStudent(\'' + s.uid + '\')" title="عرض التفاصيل">عرض</button>' +
+        '<a href="reports/' + s.uid + '_report.pdf" download class="action-btn pdf-btn" title="تحميل التقرير PDF">PDF</a>' +
+        '<a href="reports/' + s.uid + '_report.docx" download class="action-btn word-btn" title="تحميل التقرير Word">Word</a>' +
+        '<a href="reports/' + s.uid + '_answer.pdf" download class="action-btn answer-btn" title="ورقة اجابة الطالب">الإجابة</a>' +
       '</div></td>';
     body.appendChild(tr);
   });
