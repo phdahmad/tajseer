@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نتائج الاختبار النصفي - برمجة الحاسب CS1021</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #312e81 100%);
+    min-height: 100vh;
+    color: #1e293b;
+    padding: 20px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* ---------- LOGIN ---------- */
+  .login-card {
+    background: white;
+    border-radius: 24px;
+    padding: 50px 40px;
+    max-width: 480px;
+    margin: 60px auto;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  .login-card .logo {
+    width: 90px; height: 90px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: white;
+    font-size: 38px;
+    font-weight: 900;
+  }
+  .login-card h1 {
+    font-size: 26px;
+    color: #0f172a;
+    margin-bottom: 8px;
+    font-weight: 900;
+  }
+  .login-card .subtitle {
+    color: #64748b;
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+  .login-card .course-badge {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 30px;
+  }
+  .form-group { margin-bottom: 20px; text-align: right; }
+  .form-group label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #334155;
+    font-size: 15px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 18px;
+    font-family: inherit;
+    transition: all 0.2s;
+    direction: ltr;
+    text-align: center;
+    letter-spacing: 2px;
+    font-weight: 700;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+  }
+  .btn-login {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(37,99,235,0.4); }
+  .btn-login:active { transform: translateY(0); }
+  .error-msg {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fef2f2;
+    color: #dc2626;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+  .footer-note {
+    margin-top: 30px;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  /* ---------- RESULTS ---------- */
+  .header-bar {
+    background: white;
+    border-radius: 20px;
+    padding: 24px 30px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
+  .header-bar .info h2 {
+    font-size: 22px;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+  .header-bar .info p {
+    color: #64748b;
+    font-size: 14px;
+  }
+  .btn-logout {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .btn-logout:hover { background: #e2e8f0; }
+
+  .grade-hero {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
+  .grade-circle {
+    width: 200px;
+    height: 200px;
+    position: relative;
+  }
+  .grade-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .grade-circle .bg-ring { fill: none; stroke: #f1f5f9; stroke-width: 14; }
+  .grade-circle .fg-ring { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dasharray 1.5s ease; }
+  .grade-circle .text-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .grade-circle .percent { font-size: 42px; font-weight: 900; color: #0f172a; }
+  .grade-circle .of { font-size: 14px; color: #64748b; margin-top: 4px; }
+  .grade-info h1 { font-size: 32px; color: #0f172a; margin-bottom: 12px; }
+  .grade-info .tier-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 999px;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  .grade-info .uid {
+    color: #64748b;
+    font-size: 15px;
+    margin-bottom: 20px;
+    direction: ltr;
+    display: inline-block;
+  }
+  .download-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-dl {
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    border: 2px solid transparent;
+  }
+  .btn-dl.primary { background: #2563eb; color: white; }
+  .btn-dl.primary:hover { background: #1d4ed8; }
+  .btn-dl.secondary { background: #f1f5f9; color: #1e293b; border-color: #e2e8f0; }
+  .btn-dl.secondary:hover { background: #e2e8f0; }
+  .btn-dl.tertiary { background: #fef3c7; color: #854d0e; border-color: #fde68a; }
+  .btn-dl.tertiary:hover { background: #fde68a; }
+
+  .section-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
+  .section-card h3 {
+    font-size: 20px;
+    color: #0f172a;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-card h3::before { content: ''; width: 6px; height: 24px; background: linear-gradient(180deg, #2563eb, #7c3aed); border-radius: 3px; }
+
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .breakdown-item {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 14px;
+    border-right: 4px solid #2563eb;
+  }
+  .breakdown-item .name {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .breakdown-item .score {
+    font-size: 24px;
+    font-weight: 900;
+    color: #0f172a;
+  }
+  .breakdown-item .of {
+    font-size: 14px;
+    color: #94a3b8;
+  }
+  .breakdown-item .progress {
+    margin-top: 10px;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .breakdown-item .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  .questions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .questions-table th {
+    background: #f8fafc;
+    padding: 14px 12px;
+    text-align: right;
+    font-weight: 700;
+    color: #475569;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .questions-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+  }
+  .questions-table tr:hover { background: #f8fafc; }
+  .q-badge {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .status-correct { background: #dcfce7; color: #166534; }
+  .status-wrong { background: #fee2e2; color: #991b1b; }
+  .status-partial { background: #fef3c7; color: #854d0e; }
+
+  .notes-card {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 24px;
+    border-right: 6px solid #f59e0b;
+  }
+  .notes-card h3 {
+    font-size: 18px;
+    color: #78350f;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .notes-card p {
+    color: #78350f;
+    line-height: 1.9;
+    font-size: 15px;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 700px) {
+    .grade-hero { grid-template-columns: 1fr; text-align: center; }
+    .grade-info { text-align: center; }
+    .questions-table { font-size: 12px; }
+    .questions-table th, .questions-table td { padding: 8px 6px; }
+    body { padding: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="logo">CS</div>
+      <h1>نتائج الاختبار النصفي</h1>
+      <p class="subtitle">منصة عرض النتائج للطلبة</p>
+      <div class="course-badge">برمجة الحاسب — CS1021 — الشعبة 47</div>
+      <form id="login-form" onsubmit="return doLogin(event)">
+        <div class="form-group">
+          <label for="uid">الرقم الجامعي</label>
+          <input type="text" id="uid" name="uid" placeholder="447XXXXXX" maxlength="12" autocomplete="off" required>
+        </div>
+        <button type="submit" class="btn-login">عرض النتيجة ←</button>
+        <div id="error-msg" class="error-msg">رقم جامعي غير مسجل في الشعبة. تأكد من الرقم وحاول مرة اخرى.</div>
+      </form>
+      <p class="footer-note">جامعة أم القرى — كلية الحاسب الالي</p>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen" class="hidden">
+    <div class="header-bar">
+      <div class="info">
+        <h2>نتائج الاختبار النصفي</h2>
+        <p>برمجة الحاسب CS1021 — الشعبة 47 — جامعة أم القرى</p>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">تسجيل خروج</button>
+    </div>
+
+    <div class="grade-hero">
+      <div class="grade-circle">
+        <svg viewBox="0 0 200 200">
+          <circle class="bg-ring" cx="100" cy="100" r="86"/>
+          <circle id="grade-ring" class="fg-ring" cx="100" cy="100" r="86"/>
+        </svg>
+        <div class="text-overlay">
+          <div class="percent" id="grade-percent">0%</div>
+          <div class="of" id="grade-score">0/20</div>
+        </div>
+      </div>
+      <div class="grade-info">
+        <h1 id="student-name">الطالب</h1>
+        <span class="tier-badge" id="tier-badge">—</span>
+        <div class="uid" id="student-uid">—</div>
+        <div class="download-row">
+          <a href="#" id="dl-report-pdf" class="btn-dl primary" download>⬇ تحميل التقرير PDF</a>
+          <a href="#" id="dl-report-docx" class="btn-dl secondary" download>⬇ تقرير Word</a>
+          <a href="#" id="dl-answer" class="btn-dl tertiary" download>⬇ ورقة اجابتك</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3>توزيع الدرجة على اقسام الاختبار</h3>
+      <div class="breakdown-grid" id="breakdown"></div>
+    </div>
+
+    <div class="notes-card">
+      <h3>ملاحظات وتوصيات للتحسن</h3>
+      <p id="notes-text">—</p>
+    </div>
+
+    <div class="section-card">
+      <h3>التصحيح التفصيلي - سؤال سؤال</h3>
+      <div style="overflow-x: auto;">
+        <table class="questions-table">
+          <thead>
+            <tr>
+              <th>السؤال</th>
+              <th>الاجابة الصحيحة</th>
+              <th>الحالة</th>
+              <th>الدرجة</th>
+              <th>الملاحظة</th>
+            </tr>
+          </thead>
+          <tbody id="questions-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <p style="text-align: center; color: rgba(255,255,255,0.7); margin-top: 30px; font-size: 13px;">
+      تم التصحيح ضمن المراجعة الاكاديمية - برمجة الحاسب CS1021
+    </p>
+  </div>
+
+</div>
+
+<script>
+const STUDENTS_DATA = {"447055100": {"uid": "447055100", "official_name": "اسرار احمد بن بخيت الزهراني", "display_name": "أسرار أحمد الزهراني", "folder": "01_أسرار_أحمد_الزهراني", "score": 16.0, "total": 20.0, "percent": 80.0, "tier": "جيد جداً", "tier_color": "#2563eb", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "15.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "1.00", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "0.00", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C — صحيحة"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D — صحيحة"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C — صحيحة"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B — صحيحة"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B — صحيحة"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "خاطئة", "score": "0.00/0.5", "note": "اختيار الطالبة A (True)؛ الإجابة الصحيحة B (False)"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A — صحيحة"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B — صحيحة"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "خاطئة", "score": "0.00/0.5", "note": "اختيار الطالبة B (False)؛ القوائم في بايثون مرتبة (True)"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "خاطئة", "score": "0.00/0.5", "note": "اختيار الطالبة A (True)؛ القوائم تسمح بالتكرار، الصحيح False"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "خاطئة", "score": "0.00/1.25", "note": "كتبت (\"Print\")(\"Hello World\") — يجب: print(\"Hello World\") بحرف صغير وداخل قوسي الدالة"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.25", "note": "كتبت (\"YES\") فقط دون كلمة print وبدون مسافة بادئة — الصحيح: print(\"YES\") مع indentation"}], "notes": "أداء ممتاز في الاختيار من متعدد (10/10). هناك ضعف واضح في صح/خطأ والإجابات القصيرة، يحتاج إلى مراجعة قواعد بايثون الأساسية: الدالة print تكتب بأحرف صغيرة، ضبط المسافات البادئة (Indentation)، خصائص القوائم (Lists)."}, "447055146": {"uid": "447055146", "official_name": "محمد مانع بن صالح بن حوف", "display_name": "محمد مانع", "folder": "02_محمد_مانع", "score": 20.0, "total": 20.0, "percent": 100.0, "tier": "ممتاز", "tier_color": "#16a34a", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "15.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "2.50", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print (\"Hello World\") — صحيحة"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print(\"Yes\") — صحيحة بنائياً، لكن الأفضل كتابة \"YES\" بأحرف كبيرة كما طُلب"}], "notes": "أداء متميز جداً. جميع الإجابات صحيحة. ملاحظة: في السؤال 17 كتب \"Yes\" والمطلوب \"YES\" بأحرف كبيرة طبقاً لنص السؤال — هذه ملاحظة شكلية بسيطة لا تؤثر على صحة الكود وظيفياً."}, "447055139": {"uid": "447055139", "official_name": "هناء شاكر بن هاشم المنعمى", "display_name": "هناء شاكر المنعمى", "folder": "03_هفاء_الملحمي", "score": 14.0, "total": 20.0, "percent": 70.0, "tier": "جيد", "tier_color": "#0891b2", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "9.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "2.50", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار A (.pp)؛ الإجابة الصحيحة C (.py)"}, {"q": "Q2", "correct": "A — True", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C (5 > 3)؛ ناتج print(5>3) هو True أي الخيار A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار B (0,1,2,3)؛ range(3) ينتج 0,1,2 فقط — الخيار A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C/A؛ if كاذبة تتخطى الكتلة (B)"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print (\"Hello World\") — صحيحة"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print(\"YES\") — صحيحة"}], "notes": "إجابات صح/خطأ والأسئلة القصيرة ممتازة. يوجد ضعف في الاختيار من متعدد، خصوصاً مفاهيم: امتداد ملف بايثون، ناتج تعابير المقارنة، عمل دالة range(), وسلوك if مع شرط False. يُنصح بحل تمارين عملية على هذه المواضيع."}, "447055136": {"uid": "447055136", "official_name": "عبدالله علوش عايض الهزري", "display_name": "عبد المعطي شاهين الزهراني", "folder": "04_عبد_المعطي_الزهراني", "score": 18.75, "total": 20.0, "percent": 93.8, "tier": "ممتاز", "tier_color": "#16a34a", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "15.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "1.25", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print (\"Hello World\") — قبلت بعلامة الصح. ملاحظة: الأصح كتابة print بحرف صغير"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.25", "note": "كتب if 5 > 2: (\"YES\") بدون كلمة print — التصحيح: print(\"YES\") مع المسافة البادئة"}], "notes": "أداء قوي بشكل عام. التحدي الوحيد كان في السؤال 17 حيث نسي كتابة دالة print(). ينصح بالتأكد من أن إخراج النص في بايثون يتطلب استدعاء صريح للدالة print()."}, "447055109": {"uid": "447055109", "official_name": "رنا عبدالرزاق بن عبدالرحمن المغربي", "display_name": "رنا عبدالرزاق المغربي", "folder": "05_طالب_055109", "score": 17.0, "total": 20.0, "percent": 85.0, "tier": "جيد جداً", "tier_color": "#2563eb", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "12.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "2.50", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C (An error will occur)؛ الصحيح B (The code block will be skipped)"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.5", "note": "تذبذب بين B (الصحيح) و C وانتهى باختيار C — الصحيح B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print (\"Hello World\") — قبلت. ملاحظة: print يجب أن تكون بحرف صغير"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print(\"Yes\") — قبلت. ملاحظة: الأفضل كتابة \"YES\" بأحرف كبيرة كما طُلب"}], "notes": "أداء جيد في معظم الأسئلة. التذبذب في السؤال 10 يدل على عدم تثبيت قاعدة الـ Indentation. ينصح بالتركيز على: (1) سلوك if مع شرط False، (2) قاعدة المسافة البادئة الإلزامية في بايثون، (3) حساسية حالة الأحرف في الدوال."}, "447055167": {"uid": "447055167", "official_name": "عبدالله حمد بن هادي ال مطيف", "display_name": "عبدالله حمد آل مطيف", "folder": "06_عبد_الله_محمد", "score": 17.0, "total": 20.0, "percent": 85.0, "tier": "جيد جداً", "tier_color": "#2563eb", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "12.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "2.50", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار B (False)؛ ناتج print(5>3) هو True (A)"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار B (//)؛ التعليق في بايثون يبدأ بعلامة # (C)"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print (\"Hello World\") — قبلت. ملاحظة: print بحرف صغير"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print \"YES\" — قبلت. ملاحظة: ينقصها قوسا الدالة، الأصح: print(\"YES\")"}], "notes": "إتقان جيد للمفاهيم البرمجية الأساسية. الأخطاء كانت في فهم بسيط: ناتج المقارنة 5>3 يساوي True، وعلامة التعليق في بايثون هي # وليست //. يُنصح بمراجعة العمليات المنطقية وقواعد كتابة التعليقات."}, "447055077": {"uid": "447055077", "official_name": "أمنه علي بن عوض الوادعي", "display_name": "أمنه علي الوادعي", "folder": "07_طالب_07", "score": 16.75, "total": 20.0, "percent": 83.8, "tier": "جيد جداً", "tier_color": "#2563eb", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "13.50", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.00", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "1.25", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C؛ الصحيح B (المسافة البادئة الصحيحة)"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "خاطئة", "score": "0.00/0.5", "note": "اختيار A (True)؛ القوائم تسمح بالتكرار، الإجابة B (False)"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print (\"Hello World\") — قبلت. ملاحظة: print بحرف صغير"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.25", "note": "كتب Print \"Yes\" — التصحيح: print(\"YES\") مع القوسين والأحرف الكبيرة لكلمة YES"}], "notes": "أداء جيد جداً في الاختيار من متعدد (9/10) وصح/خطأ (4/5). أبرز نقاط الضعف: قواعد المسافة البادئة في الكتابة الكاملة، وقواعد دالة print (الحروف، الأقواس، حساسية الحالة). يُنصح بكتابة الكود الفعلي وتجربته على الحاسب لتثبيت هذه القواعد."}, "447055080": {"uid": "447055080", "official_name": "ايمان عبده احمد حكمي", "display_name": "Eman Abdu Hakami", "folder": "08_Eman_Abdu_Hakami", "score": 13.5, "total": 20.0, "percent": 67.5, "tier": "مقبول", "tier_color": "#ea580c", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "13.50", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "0.00", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "0.00", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C؛ الصحيح B (المسافة البادئة الصحيحة)"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة (Q11–Q17) غير موجودة في المسح الضوئي"}, {"q": "Q12", "correct": "A — True", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "مفقودة", "score": "0.00/1.25", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "مفقودة", "score": "0.00/1.25", "note": "الصفحة الأخيرة غير موجودة"}], "notes": "⚠️ ملاحظة مهمة: ورقة الإجابة لهذه الطالبة تحتوي على 3 صفحات فقط (الغلاف + الاختيار من متعدد). الصفحة الرابعة المتضمنة لأسئلة صح/خطأ والأسئلة القصيرة (Q11-Q17) غير موجودة في الملف الممسوح ضوئياً، لذا تم تصحيح الجزء الظاهر فقط. أداء ممتاز في الاختيار من متعدد (9/10). يُرجى إعادة مسح الصفحة المفقودة لإكمال التصحيح."}};
+
+// ===== Login activity tracking =====
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2rljF8PAZzJYqVf8Zk2uEhvyrM56_jWh7kbBV1WF0Jnfb0cJfuSUb6ZvQuKrgHoXlbA/exec";
+
+function detectDevice() {
+  const ua = navigator.userAgent;
+  if (/iPad|Tablet/i.test(ua)) return 'tablet';
+  if (/Mobi|Android|iPhone/i.test(ua)) return 'mobile';
+  return 'desktop';
+}
+
+function detectBrowser() {
+  const ua = navigator.userAgent;
+  if (/Edg\//.test(ua)) return 'Edge';
+  if (/OPR\//.test(ua) || /Opera/.test(ua)) return 'Opera';
+  if (/Chrome\//.test(ua) && !/Edg\//.test(ua)) return 'Chrome';
+  if (/Firefox\//.test(ua)) return 'Firefox';
+  if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return 'Safari';
+  return 'Other';
+}
+
+function logActivity(payload) {
+  try {
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).catch(() => {}); // ignore errors silently
+  } catch (e) {}
+}
+
+function doLogin(e) {
+  e.preventDefault();
+  const uid = document.getElementById('uid').value.trim().replace(/^[Ss]/, '');
+  const err = document.getElementById('error-msg');
+  const device = detectDevice();
+  const browser = detectBrowser();
+  const ua = (navigator.userAgent || '').substring(0, 200);
+
+  if (STUDENTS_DATA[uid]) {
+    err.classList.remove('show');
+    const s = STUDENTS_DATA[uid];
+    logActivity({
+      uid: s.uid,
+      name: s.display_name,
+      status: 'success',
+      device: device,
+      browser: browser,
+      userAgent: ua,
+      attemptedUid: uid
+    });
+    showResults(s);
+  } else {
+    err.classList.add('show');
+    logActivity({
+      uid: '',
+      name: '',
+      status: 'failed',
+      device: device,
+      browser: browser,
+      userAgent: ua,
+      attemptedUid: uid
+    });
+  }
+  return false;
+}
+
+function doLogout() {
+  document.getElementById('results-screen').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('uid').value = '';
+  document.getElementById('error-msg').classList.remove('show');
+  window.scrollTo(0, 0);
+}
+
+function statusClass(status) {
+  if (status.includes('صحيحة')) return 'status-correct';
+  if (status.includes('خاطئة') || status.includes('خطأ')) return 'status-wrong';
+  return 'status-partial';
+}
+
+function showResults(s) {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+
+  document.getElementById('student-name').textContent = s.display_name;
+  document.getElementById('student-uid').textContent = 'الرقم الجامعي: ' + s.uid;
+  document.getElementById('grade-percent').textContent = s.percent.toFixed(1) + '%';
+  document.getElementById('grade-score').textContent = s.score + ' / ' + s.total;
+
+  const tier = document.getElementById('tier-badge');
+  tier.textContent = s.tier;
+  tier.style.background = s.tier_color;
+
+  // Set ring stroke based on percent
+  const ring = document.getElementById('grade-ring');
+  const circumference = 2 * Math.PI * 86;
+  ring.style.stroke = s.tier_color;
+  ring.style.strokeDasharray = '0 ' + circumference;
+  setTimeout(() => {
+    ring.style.strokeDasharray = (circumference * s.percent / 100) + ' ' + circumference;
+  }, 100);
+
+  // Notes
+  document.getElementById('notes-text').textContent = s.notes || 'لا توجد ملاحظات اضافية.';
+
+  // Section breakdown
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = '';
+  s.sections.forEach(sec => {
+    const score = parseFloat(sec.score), max = parseFloat(sec.max);
+    const pct = max > 0 ? (score / max) * 100 : 0;
+    const div = document.createElement('div');
+    div.className = 'breakdown-item';
+    div.innerHTML =
+      '<div class="name">' + sec.name + '</div>' +
+      '<div><span class="score">' + sec.score + '</span> <span class="of">/ ' + sec.max + '</span></div>' +
+      '<div class="progress"><div class="progress-fill" style="width:0%"></div></div>';
+    bd.appendChild(div);
+    setTimeout(() => {
+      div.querySelector('.progress-fill').style.width = pct + '%';
+    }, 200);
+  });
+
+  // Questions table
+  const body = document.getElementById('questions-body');
+  body.innerHTML = '';
+  s.questions.forEach(q => {
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><span class="q-badge">' + q.q + '</span></td>' +
+      '<td style="font-family:Consolas,monospace;font-size:13px;">' + escapeHtml(q.correct) + '</td>' +
+      '<td><span class="status-badge ' + statusClass(q.status) + '">' + q.status + '</span></td>' +
+      '<td style="font-weight:700;">' + q.score + '</td>' +
+      '<td style="color:#475569;font-size:13px;">' + escapeHtml(q.note) + '</td>';
+    body.appendChild(tr);
+  });
+
+  // Download links
+  document.getElementById('dl-report-pdf').href = 'reports/' + s.uid + '_report.pdf';
+  document.getElementById('dl-report-docx').href = 'reports/' + s.uid + '_report.docx';
+  document.getElementById('dl-answer').href = 'reports/' + s.uid + '_answer.pdf';
+
+  window.scrollTo(0, 0);
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML.replace(/\n/g, '<br>');
+}
+
+document.getElementById('uid').focus();
+</script>
+</body>
+</html>

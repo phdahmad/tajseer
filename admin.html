@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم - برمجة الحاسب CS1021</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, sans-serif;
+    background: #f1f5f9;
+    min-height: 100vh;
+    color: #1e293b;
+  }
+  .login-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #1e3a8a 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-card {
+    background: white;
+    border-radius: 24px;
+    padding: 50px 40px;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+    text-align: center;
+  }
+  .login-card .logo {
+    width: 90px; height: 90px;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: white;
+    font-size: 36px;
+  }
+  .login-card h1 { font-size: 24px; color: #0f172a; margin-bottom: 8px; font-weight: 900; }
+  .login-card .subtitle { color: #64748b; font-size: 15px; margin-bottom: 30px; }
+  .form-group { margin-bottom: 20px; text-align: right; }
+  .form-group label { display: block; font-weight: 700; margin-bottom: 8px; color: #334155; font-size: 14px; }
+  .form-group input {
+    width: 100%; padding: 16px 20px;
+    border: 2px solid #e2e8f0; border-radius: 12px;
+    font-size: 18px; font-family: inherit; transition: all 0.2s;
+    text-align: center; font-weight: 700;
+  }
+  .form-group input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124,58,237,0.1); }
+  .btn-login {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    color: white; border: none; border-radius: 12px;
+    font-size: 17px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(124,58,237,0.4); }
+  .error-msg {
+    margin-top: 16px; padding: 12px;
+    background: #fef2f2; color: #dc2626;
+    border-radius: 8px; font-size: 14px; font-weight: 500; display: none;
+  }
+  .error-msg.show { display: block; }
+
+  /* Dashboard */
+  .dashboard { display: none; }
+  .dashboard.active { display: block; }
+  .topbar {
+    background: white;
+    padding: 18px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .topbar .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar .brand-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 18px;
+  }
+  .topbar .brand-text h1 { font-size: 18px; color: #0f172a; font-weight: 900; }
+  .topbar .brand-text p { font-size: 13px; color: #64748b; }
+  .topbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: #7c3aed; color: white; }
+  .btn-primary:hover { background: #6d28d9; }
+  .btn-secondary { background: #f1f5f9; color: #1e293b; }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .btn-danger { background: #fef2f2; color: #dc2626; }
+  .btn-danger:hover { background: #fee2e2; }
+  .btn-success { background: #10b981; color: white; }
+  .btn-success:hover { background: #059669; }
+
+  .container { padding: 24px 30px; max-width: 1400px; margin: 0 auto; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border-top: 4px solid #7c3aed;
+  }
+  .stat-card.green { border-top-color: #10b981; }
+  .stat-card.blue { border-top-color: #2563eb; }
+  .stat-card.orange { border-top-color: #f59e0b; }
+  .stat-card.red { border-top-color: #ef4444; }
+  .stat-card.purple { border-top-color: #7c3aed; }
+  .stat-card .label {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .stat-card .value {
+    font-size: 32px;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1;
+  }
+  .stat-card .sub {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+
+  .panel {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .panel-header h2 {
+    font-size: 18px;
+    color: #0f172a;
+    font-weight: 900;
+  }
+  .panel-body { padding: 24px; }
+
+  /* Distribution chart */
+  .dist-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .dist-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 80px;
+    align-items: center;
+    gap: 12px;
+  }
+  .dist-label {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .dist-bar {
+    height: 28px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .dist-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-left: 12px;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .dist-count {
+    text-align: left;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* Students table */
+  .students-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .students-table th {
+    background: #f8fafc;
+    padding: 14px 16px;
+    text-align: right;
+    font-weight: 700;
+    color: #475569;
+    font-size: 13px;
+    border-bottom: 2px solid #e2e8f0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .students-table th:hover { background: #f1f5f9; }
+  .students-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+  }
+  .students-table tr:hover td { background: #f8fafc; }
+  .students-table .rank {
+    width: 36px;
+    height: 36px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+  }
+  .students-table .rank.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+  .students-table .rank.silver { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: white; }
+  .students-table .rank.bronze { background: linear-gradient(135deg, #d97706, #92400e); color: white; }
+  .students-table .student-name { font-weight: 700; color: #0f172a; }
+  .students-table .uid { font-size: 12px; color: #64748b; direction: ltr; display: inline-block; }
+  .score-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 14px;
+  }
+  .tier-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    color: white;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .actions-cell {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .icon-btn:hover { transform: scale(1.05); }
+  .icon-btn.view { background: #eff6ff; color: #1d4ed8; }
+  .icon-btn.pdf { background: #fef2f2; color: #dc2626; }
+  .icon-btn.docx { background: #eff6ff; color: #2563eb; }
+  .icon-btn.answer { background: #fef3c7; color: #92400e; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.7);
+    z-index: 100;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 20px;
+    max-width: 1000px;
+    width: 100%;
+    margin: auto;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-header {
+    padding: 24px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h2 { font-size: 22px; color: #0f172a; }
+  .modal-close {
+    background: #f1f5f9;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    color: #475569;
+  }
+  .modal-body { padding: 24px 30px; }
+
+  .modal-grade-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 30px;
+    align-items: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+  }
+  .modal-circle { width: 130px; height: 130px; position: relative; }
+  .modal-circle svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .modal-circle .text-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-circle .percent { font-size: 28px; font-weight: 900; color: #0f172a; }
+  .modal-circle .of { font-size: 12px; color: #64748b; }
+
+  .modal-section { margin-bottom: 24px; }
+  .modal-section h3 {
+    font-size: 16px;
+    color: #0f172a;
+    margin-bottom: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-section h3::before {
+    content: '';
+    width: 4px; height: 18px;
+    background: linear-gradient(180deg, #7c3aed, #db2777);
+    border-radius: 2px;
+  }
+  .breakdown-grid-modal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .breakdown-modal {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 10px;
+    border-right: 3px solid #7c3aed;
+  }
+  .breakdown-modal .name { font-size: 12px; color: #475569; margin-bottom: 6px; }
+  .breakdown-modal .val { font-size: 20px; font-weight: 900; color: #0f172a; }
+  .breakdown-modal .of { font-size: 12px; color: #94a3b8; }
+
+  .notes-box {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border-right: 4px solid #f59e0b;
+    color: #78350f;
+    line-height: 1.8;
+    font-size: 14px;
+  }
+
+  .qtable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .qtable th {
+    background: #f8fafc;
+    padding: 10px 8px;
+    text-align: right;
+    font-weight: 700;
+    color: #475569;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .qtable td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+  }
+  .q-badge2 {
+    background: #ede9fe;
+    color: #6d28d9;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .status-correct { background: #dcfce7; color: #166534; padding: 3px 10px; border-radius: 5px; font-size: 12px; font-weight: 700; }
+  .status-wrong { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 5px; font-size: 12px; font-weight: 700; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+  }
+
+  /* Activity panel */
+  .refresh-btn {
+    background: #ede9fe;
+    color: #6d28d9;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: inherit;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .refresh-btn:hover { background: #ddd6fe; }
+  .refresh-btn.spinning { opacity: 0.6; pointer-events: none; }
+  .activity-loading {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+  .activity-error {
+    background: #fef2f2;
+    color: #991b1b;
+    padding: 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .activity-section {
+    margin-bottom: 24px;
+  }
+  .activity-section h3 {
+    font-size: 16px;
+    color: #0f172a;
+    margin-bottom: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .activity-section h3::before {
+    content: '';
+    width: 4px; height: 18px;
+    background: linear-gradient(180deg, #7c3aed, #db2777);
+    border-radius: 2px;
+  }
+  .day-chart {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    height: 140px;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 0;
+    overflow-x: auto;
+  }
+  .day-bar-wrap {
+    flex: 1;
+    min-width: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .day-bar {
+    width: 100%;
+    background: linear-gradient(180deg, #a78bfa, #7c3aed);
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    position: relative;
+    transition: height 0.5s ease;
+  }
+  .day-bar-count {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+  }
+  .day-bar-label {
+    font-size: 11px;
+    color: #64748b;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .activity-table th {
+    background: #f8fafc;
+    padding: 12px 10px;
+    text-align: right;
+    font-weight: 700;
+    color: #475569;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 12px;
+  }
+  .activity-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .activity-table tr:hover td { background: #f8fafc; }
+  .badge-success { background: #dcfce7; color: #166534; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .badge-fail { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .badge-not-yet { background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .badge-device { background: #f1f5f9; color: #475569; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .activity-log-list {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+  }
+  .log-row {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
+    font-size: 13px;
+  }
+  .log-row:last-child { border-bottom: none; }
+  .log-row .time {
+    color: #64748b;
+    font-size: 12px;
+    direction: ltr;
+    text-align: right;
+    font-weight: 500;
+  }
+  .log-row .who {
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .log-row .who .uid-small {
+    font-size: 11px;
+    color: #94a3b8;
+    direction: ltr;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  .empty-msg {
+    text-align: center;
+    color: #94a3b8;
+    padding: 30px;
+    font-size: 13px;
+  }
+  .absent-pill {
+    display: inline-block;
+    background: #fef2f2;
+    color: #991b1b;
+    padding: 8px 14px;
+    border-radius: 999px;
+    margin: 4px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .search-box {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .search-box input {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .search-box input:focus { outline: none; border-color: #7c3aed; }
+  .search-box select {
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .topbar { padding: 14px 16px; }
+    .container { padding: 16px; }
+    .modal-grade-row { grid-template-columns: 1fr; text-align: center; }
+    .stat-card .value { font-size: 24px; }
+    .actions-cell { flex-wrap: nowrap; overflow-x: auto; }
+    .students-table { font-size: 12px; }
+    .students-table td, .students-table th { padding: 10px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page" class="login-bg">
+  <div class="login-card">
+    <div class="logo">⚙</div>
+    <h1>لوحة تحكم المدرس</h1>
+    <p class="subtitle">برمجة الحاسب CS1021 - الشعبة 47</p>
+    <form id="login-form" onsubmit="return doLogin(event)">
+      <div class="form-group">
+        <label for="pwd">كلمة السر</label>
+        <input type="password" id="pwd" autocomplete="off" required>
+      </div>
+      <button type="submit" class="btn-login">دخول ←</button>
+      <div id="error-msg" class="error-msg">كلمة سر خاطئة</div>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="dashboard">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">CS</div>
+      <div class="brand-text">
+        <h1>لوحة تحكم المدرس</h1>
+        <p>برمجة الحاسب CS1021 - الشعبة 47</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <a href="reports/all_reports.zip" download class="btn btn-success">
+        ⬇ تحميل كل التقارير ZIP
+      </a>
+      <a href="index.html" class="btn btn-secondary">عرض صفحة الطلبة</a>
+      <button onclick="doLogout()" class="btn btn-danger">خروج</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card purple">
+        <div class="label">عدد الطلبة</div>
+        <div class="value" id="stat-count">0</div>
+        <div class="sub">المسجلين في الشعبة</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="label">متوسط الدرجات</div>
+        <div class="value" id="stat-avg">0%</div>
+        <div class="sub" id="stat-avg-points">- / 20</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">اعلى درجة</div>
+        <div class="value" id="stat-max">0</div>
+        <div class="sub" id="stat-max-name">-</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="label">ادنى درجة</div>
+        <div class="value" id="stat-min">0</div>
+        <div class="sub" id="stat-min-name">-</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">عدد الناجحين</div>
+        <div class="value" id="stat-pass">0</div>
+        <div class="sub">≥ 60%</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">عدد الراسبين</div>
+        <div class="value" id="stat-fail">0</div>
+        <div class="sub">< 60%</div>
+      </div>
+    </div>
+
+    <!-- Distribution chart -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>توزيع التقديرات</h2>
+      </div>
+      <div class="panel-body">
+        <div class="dist-chart" id="dist-chart"></div>
+      </div>
+    </div>
+
+    <!-- Login Activity panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>نشاط الدخول</h2>
+        <button id="refresh-activity" class="refresh-btn" onclick="loadActivity()">
+          <span id="refresh-icon">↻</span> تحديث البيانات
+        </button>
+      </div>
+      <div class="panel-body">
+        <div id="activity-content">
+          <div class="activity-loading">جار تحميل بيانات الدخول...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students table -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>قائمة الطلبة وتقاريرهم</h2>
+      </div>
+      <div class="panel-body">
+        <div class="search-box">
+          <input type="text" id="search" placeholder="بحث بالاسم او الرقم الجامعي..." oninput="renderTable()">
+          <select id="filter-tier" onchange="renderTable()">
+            <option value="">كل التقديرات</option>
+            <option value="ممتاز">ممتاز</option>
+            <option value="جيد جداً">جيد جداً</option>
+            <option value="جيد">جيد</option>
+            <option value="مقبول">مقبول</option>
+            <option value="راسب">راسب</option>
+          </select>
+          <select id="sort-by" onchange="renderTable()">
+            <option value="rank">ترتيب: حسب الدرجة</option>
+            <option value="name">ترتيب: حسب الاسم</option>
+            <option value="uid">ترتيب: حسب الرقم</option>
+          </select>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th>الترتيب</th>
+                <th>الاسم</th>
+                <th>الرقم الجامعي</th>
+                <th>الدرجة</th>
+                <th>%</th>
+                <th>التقدير</th>
+                <th>الاجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target.id==='modal')closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">تفاصيل الطالب</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const PASSWORD = "تجسير";
+const STUDENTS_DATA = {"447055100": {"uid": "447055100", "official_name": "اسرار احمد بن بخيت الزهراني", "display_name": "أسرار أحمد الزهراني", "folder": "01_أسرار_أحمد_الزهراني", "score": 16.0, "total": 20.0, "percent": 80.0, "tier": "جيد جداً", "tier_color": "#2563eb", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "15.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "1.00", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "0.00", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C — صحيحة"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D — صحيحة"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C — صحيحة"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B — صحيحة"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A — صحيحة"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B — صحيحة"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "خاطئة", "score": "0.00/0.5", "note": "اختيار الطالبة A (True)؛ الإجابة الصحيحة B (False)"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A — صحيحة"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B — صحيحة"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "خاطئة", "score": "0.00/0.5", "note": "اختيار الطالبة B (False)؛ القوائم في بايثون مرتبة (True)"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "خاطئة", "score": "0.00/0.5", "note": "اختيار الطالبة A (True)؛ القوائم تسمح بالتكرار، الصحيح False"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "خاطئة", "score": "0.00/1.25", "note": "كتبت (\"Print\")(\"Hello World\") — يجب: print(\"Hello World\") بحرف صغير وداخل قوسي الدالة"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.25", "note": "كتبت (\"YES\") فقط دون كلمة print وبدون مسافة بادئة — الصحيح: print(\"YES\") مع indentation"}], "notes": "أداء ممتاز في الاختيار من متعدد (10/10). هناك ضعف واضح في صح/خطأ والإجابات القصيرة، يحتاج إلى مراجعة قواعد بايثون الأساسية: الدالة print تكتب بأحرف صغيرة، ضبط المسافات البادئة (Indentation)، خصائص القوائم (Lists)."}, "447055146": {"uid": "447055146", "official_name": "محمد مانع بن صالح بن حوف", "display_name": "محمد مانع", "folder": "02_محمد_مانع", "score": 20.0, "total": 20.0, "percent": 100.0, "tier": "ممتاز", "tier_color": "#16a34a", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "15.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "2.50", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print (\"Hello World\") — صحيحة"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print(\"Yes\") — صحيحة بنائياً، لكن الأفضل كتابة \"YES\" بأحرف كبيرة كما طُلب"}], "notes": "أداء متميز جداً. جميع الإجابات صحيحة. ملاحظة: في السؤال 17 كتب \"Yes\" والمطلوب \"YES\" بأحرف كبيرة طبقاً لنص السؤال — هذه ملاحظة شكلية بسيطة لا تؤثر على صحة الكود وظيفياً."}, "447055139": {"uid": "447055139", "official_name": "هناء شاكر بن هاشم المنعمى", "display_name": "هناء شاكر المنعمى", "folder": "03_هفاء_الملحمي", "score": 14.0, "total": 20.0, "percent": 70.0, "tier": "جيد", "tier_color": "#0891b2", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "9.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "2.50", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار A (.pp)؛ الإجابة الصحيحة C (.py)"}, {"q": "Q2", "correct": "A — True", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C (5 > 3)؛ ناتج print(5>3) هو True أي الخيار A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار B (0,1,2,3)؛ range(3) ينتج 0,1,2 فقط — الخيار A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C/A؛ if كاذبة تتخطى الكتلة (B)"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print (\"Hello World\") — صحيحة"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print(\"YES\") — صحيحة"}], "notes": "إجابات صح/خطأ والأسئلة القصيرة ممتازة. يوجد ضعف في الاختيار من متعدد، خصوصاً مفاهيم: امتداد ملف بايثون، ناتج تعابير المقارنة، عمل دالة range(), وسلوك if مع شرط False. يُنصح بحل تمارين عملية على هذه المواضيع."}, "447055136": {"uid": "447055136", "official_name": "عبدالله علوش عايض الهزري", "display_name": "عبد المعطي شاهين الزهراني", "folder": "04_عبد_المعطي_الزهراني", "score": 18.75, "total": 20.0, "percent": 93.8, "tier": "ممتاز", "tier_color": "#16a34a", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "15.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "1.25", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print (\"Hello World\") — قبلت بعلامة الصح. ملاحظة: الأصح كتابة print بحرف صغير"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.25", "note": "كتب if 5 > 2: (\"YES\") بدون كلمة print — التصحيح: print(\"YES\") مع المسافة البادئة"}], "notes": "أداء قوي بشكل عام. التحدي الوحيد كان في السؤال 17 حيث نسي كتابة دالة print(). ينصح بالتأكد من أن إخراج النص في بايثون يتطلب استدعاء صريح للدالة print()."}, "447055109": {"uid": "447055109", "official_name": "رنا عبدالرزاق بن عبدالرحمن المغربي", "display_name": "رنا عبدالرزاق المغربي", "folder": "05_طالب_055109", "score": 17.0, "total": 20.0, "percent": 85.0, "tier": "جيد جداً", "tier_color": "#2563eb", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "12.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "2.50", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C (An error will occur)؛ الصحيح B (The code block will be skipped)"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.5", "note": "تذبذب بين B (الصحيح) و C وانتهى باختيار C — الصحيح B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print (\"Hello World\") — قبلت. ملاحظة: print يجب أن تكون بحرف صغير"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.25/1.25", "note": "print(\"Yes\") — قبلت. ملاحظة: الأفضل كتابة \"YES\" بأحرف كبيرة كما طُلب"}], "notes": "أداء جيد في معظم الأسئلة. التذبذب في السؤال 10 يدل على عدم تثبيت قاعدة الـ Indentation. ينصح بالتركيز على: (1) سلوك if مع شرط False، (2) قاعدة المسافة البادئة الإلزامية في بايثون، (3) حساسية حالة الأحرف في الدوال."}, "447055167": {"uid": "447055167", "official_name": "عبدالله حمد بن هادي ال مطيف", "display_name": "عبدالله حمد آل مطيف", "folder": "06_عبد_الله_محمد", "score": 17.0, "total": 20.0, "percent": 85.0, "tier": "جيد جداً", "tier_color": "#2563eb", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "12.00", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.50", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "2.50", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار B (False)؛ ناتج print(5>3) هو True (A)"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار B (//)؛ التعليق في بايثون يبدأ بعلامة # (C)"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print (\"Hello World\") — قبلت. ملاحظة: print بحرف صغير"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print \"YES\" — قبلت. ملاحظة: ينقصها قوسا الدالة، الأصح: print(\"YES\")"}], "notes": "إتقان جيد للمفاهيم البرمجية الأساسية. الأخطاء كانت في فهم بسيط: ناتج المقارنة 5>3 يساوي True، وعلامة التعليق في بايثون هي # وليست //. يُنصح بمراجعة العمليات المنطقية وقواعد كتابة التعليقات."}, "447055077": {"uid": "447055077", "official_name": "أمنه علي بن عوض الوادعي", "display_name": "أمنه علي الوادعي", "folder": "07_طالب_07", "score": 16.75, "total": 20.0, "percent": 83.8, "tier": "جيد جداً", "tier_color": "#2563eb", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "13.50", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "2.00", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "1.25", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C؛ الصحيح B (المسافة البادئة الصحيحة)"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q12", "correct": "A — True", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "صحيحة", "score": "0.50/0.5", "note": "B"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "صحيحة", "score": "0.50/0.5", "note": "A"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "خاطئة", "score": "0.00/0.5", "note": "اختيار A (True)؛ القوائم تسمح بالتكرار، الإجابة B (False)"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "صحيحة", "score": "1.25/1.25", "note": "Print (\"Hello World\") — قبلت. ملاحظة: print بحرف صغير"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.25", "note": "كتب Print \"Yes\" — التصحيح: print(\"YES\") مع القوسين والأحرف الكبيرة لكلمة YES"}], "notes": "أداء جيد جداً في الاختيار من متعدد (9/10) وصح/خطأ (4/5). أبرز نقاط الضعف: قواعد المسافة البادئة في الكتابة الكاملة، وقواعد دالة print (الحروف، الأقواس، حساسية الحالة). يُنصح بكتابة الكود الفعلي وتجربته على الحاسب لتثبيت هذه القواعد."}, "447055080": {"uid": "447055080", "official_name": "ايمان عبده احمد حكمي", "display_name": "Eman Abdu Hakami", "folder": "08_Eman_Abdu_Hakami", "score": 13.5, "total": 20.0, "percent": 67.5, "tier": "مقبول", "tier_color": "#ea580c", "sections": [{"name": "اختيار من متعدد (Q1–Q10)", "score": "13.50", "max": "15.00"}, {"name": "صح / خطأ (Q11–Q15)", "score": "0.00", "max": "2.50"}, {"name": "إجابة قصيرة (Q16–Q17)", "score": "0.00", "max": "2.50"}], "questions": [{"q": "Q1", "correct": "C — .py", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q2", "correct": "A — True", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q3", "correct": "D — x = 5", "status": "صحيحة", "score": "1.50/1.5", "note": "D"}, {"q": "Q4", "correct": "C — #", "status": "صحيحة", "score": "1.50/1.5", "note": "C"}, {"q": "Q5", "correct": "A — for x in [...]:  مع علامة النقطتين", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q6", "correct": "A — 0, 1, 2", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q7", "correct": "A — A Boolean condition (True/False)", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q8", "correct": "B — The code block will be skipped", "status": "صحيحة", "score": "1.50/1.5", "note": "B"}, {"q": "Q9", "correct": "A — for / in", "status": "صحيحة", "score": "1.50/1.5", "note": "A"}, {"q": "Q10", "correct": "B — if 5 > 2:\n    print(\"YES\")", "status": "خاطئة", "score": "0.00/1.5", "note": "اختيار C؛ الصحيح B (المسافة البادئة الصحيحة)"}, {"q": "Q11", "correct": "B — False — المسافات البادئة جزء من بناء لغة بايثون وليست للقراءة فقط", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة (Q11–Q17) غير موجودة في المسح الضوئي"}, {"q": "Q12", "correct": "A — True", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q13", "correct": "B — False — أسماء المتغيرات حساسة لحالة الأحرف", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q14", "correct": "A — True — القوائم في بايثون مرتبة", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q15", "correct": "B — False — القوائم تسمح بالقيم المكررة", "status": "مفقودة", "score": "0.00/0.5", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q16", "correct": "print(\"Hello World\")", "status": "مفقودة", "score": "0.00/1.25", "note": "الصفحة الأخيرة غير موجودة"}, {"q": "Q17", "correct": "if 5 > 2:\n    print(\"YES\")", "status": "مفقودة", "score": "0.00/1.25", "note": "الصفحة الأخيرة غير موجودة"}], "notes": "⚠️ ملاحظة مهمة: ورقة الإجابة لهذه الطالبة تحتوي على 3 صفحات فقط (الغلاف + الاختيار من متعدد). الصفحة الرابعة المتضمنة لأسئلة صح/خطأ والأسئلة القصيرة (Q11-Q17) غير موجودة في الملف الممسوح ضوئياً، لذا تم تصحيح الجزء الظاهر فقط. أداء ممتاز في الاختيار من متعدد (9/10). يُرجى إعادة مسح الصفحة المفقودة لإكمال التصحيح."}};
+
+function doLogin(e) {
+  e.preventDefault();
+  const pwd = document.getElementById('pwd').value;
+  const err = document.getElementById('error-msg');
+  if (pwd === PASSWORD) {
+    err.classList.remove('show');
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('dashboard').classList.add('active');
+    sessionStorage.setItem('admin_logged', '1');
+    initDashboard();
+  } else {
+    err.classList.add('show');
+  }
+  return false;
+}
+
+function doLogout() {
+  sessionStorage.removeItem('admin_logged');
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('pwd').value = '';
+}
+
+// ===== Login Activity =====
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2rljF8PAZzJYqVf8Zk2uEhvyrM56_jWh7kbBV1WF0Jnfb0cJfuSUb6ZvQuKrgHoXlbA/exec";
+
+let activityRows = null;
+
+async function loadActivity() {
+  const container = document.getElementById('activity-content');
+  const refreshIcon = document.getElementById('refresh-icon');
+  const refreshBtn = document.getElementById('refresh-activity');
+  refreshBtn.classList.add('spinning');
+  refreshIcon.textContent = '⏳';
+
+  container.innerHTML = '<div class="activity-loading">جار تحميل بيانات الدخول...</div>';
+
+  try {
+    const url = SCRIPT_URL + '?password=' + encodeURIComponent(PASSWORD);
+    const res = await fetch(url, { method: 'GET', redirect: 'follow' });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'unknown error');
+    activityRows = data.rows || [];
+    renderActivity();
+  } catch (err) {
+    container.innerHTML = '<div class="activity-error"><b>خطأ في الاتصال:</b> ' + err.message + '<br><small>تأكد من ان السكربت منشور على Google Apps Script ومن صحة كلمة السر.</small></div>';
+  } finally {
+    refreshBtn.classList.remove('spinning');
+    refreshIcon.textContent = '↻';
+  }
+}
+
+function fmtDateTime(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const months = ['يناير','فبراير','مارس','ابريل','مايو','يونيو','يوليو','اغسطس','سبتمبر','اكتوبر','نوفمبر','ديسمبر'];
+  const day = d.getDate();
+  const month = months[d.getMonth()];
+  const year = d.getFullYear();
+  let h = d.getHours();
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const ampm = h >= 12 ? 'م' : 'ص';
+  h = h % 12 || 12;
+  return `${day} ${month} ${year} - ${h}:${m} ${ampm}`;
+}
+
+function fmtDateOnly(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function fmtDateShort(iso) {
+  const d = new Date(iso);
+  return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+}
+
+function deviceLabel(d) {
+  if (d === 'mobile') return '📱 موبايل';
+  if (d === 'tablet') return '📱 تابلت';
+  if (d === 'desktop') return '💻 كمبيوتر';
+  return d || '-';
+}
+
+function timeAgo(iso) {
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  if (diff < 60000) return 'قبل ثوانٍ';
+  if (diff < 3600000) return 'قبل ' + Math.floor(diff/60000) + ' دقيقة';
+  if (diff < 86400000) return 'قبل ' + Math.floor(diff/3600000) + ' ساعة';
+  return 'قبل ' + Math.floor(diff/86400000) + ' يوم';
+}
+
+function renderActivity() {
+  const rows = activityRows || [];
+  const successRows = rows.filter(r => r.status === 'success');
+  const failedRows = rows.filter(r => r.status === 'failed');
+
+  const perStudent = {};
+  Object.values(STUDENTS_DATA).forEach(s => {
+    perStudent[s.uid] = { student: s, logins: [], count: 0, first: null, last: null, devices: new Set(), browsers: new Set() };
+  });
+  successRows.forEach(r => {
+    if (perStudent[r.uid]) {
+      perStudent[r.uid].logins.push(r);
+      perStudent[r.uid].count++;
+      if (r.device) perStudent[r.uid].devices.add(r.device);
+      if (r.browser) perStudent[r.uid].browsers.add(r.browser);
+      const t = new Date(r.timestamp).getTime();
+      if (!perStudent[r.uid].first || t < new Date(perStudent[r.uid].first).getTime()) perStudent[r.uid].first = r.timestamp;
+      if (!perStudent[r.uid].last || t > new Date(perStudent[r.uid].last).getTime()) perStudent[r.uid].last = r.timestamp;
+    }
+  });
+
+  const studentsArr = Object.values(perStudent);
+  const loggedInCount = studentsArr.filter(p => p.count > 0).length;
+  const totalStudents = studentsArr.length;
+  const absentCount = totalStudents - loggedInCount;
+  const totalLogins = successRows.length;
+  const lastLogin = successRows.length > 0 ? successRows[successRows.length - 1].timestamp : null;
+
+  const byDay = {};
+  successRows.forEach(r => {
+    const d = fmtDateOnly(r.timestamp);
+    if (!d) return;
+    byDay[d] = (byDay[d] || 0) + 1;
+  });
+  const days = Object.keys(byDay).sort();
+  const maxDay = Math.max(1, ...Object.values(byDay));
+
+  let html = '';
+
+  html += '<div class="stats-grid" style="margin-bottom:24px;">';
+  html += '<div class="stat-card purple"><div class="label">اجمالي التسجيلات</div><div class="value">' + totalLogins + '</div><div class="sub">' + (lastLogin ? 'اخر دخول: ' + timeAgo(lastLogin) : 'لا يوجد بعد') + '</div></div>';
+  html += '<div class="stat-card green"><div class="label">طلبة دخلوا</div><div class="value">' + loggedInCount + ' / ' + totalStudents + '</div><div class="sub">شافوا نتيجتهم</div></div>';
+  html += '<div class="stat-card orange"><div class="label">طلبة لم يدخلوا</div><div class="value">' + absentCount + '</div><div class="sub">يحتاجون تذكير</div></div>';
+  html += '<div class="stat-card red"><div class="label">محاولات فاشلة</div><div class="value">' + failedRows.length + '</div><div class="sub">ارقام خاطئة</div></div>';
+  html += '</div>';
+
+  if (days.length > 0) {
+    html += '<div class="activity-section"><h3>الدخول حسب اليوم</h3><div class="day-chart">';
+    days.forEach(d => {
+      const cnt = byDay[d];
+      const h = (cnt / maxDay) * 110;
+      html += '<div class="day-bar-wrap"><div class="day-bar" style="height:' + h + 'px"><span class="day-bar-count">' + cnt + '</span></div><div class="day-bar-label">' + fmtDateShort(d + 'T00:00:00') + '</div></div>';
+    });
+    html += '</div></div>';
+  }
+
+  html += '<div class="activity-section"><h3>نشاط كل طالب</h3>';
+  html += '<div style="overflow-x:auto;"><table class="activity-table"><thead><tr>';
+  html += '<th>الطالب</th><th>الرقم</th><th>عدد المرات</th><th>اول دخول</th><th>اخر دخول</th><th>الجهاز</th><th>المتصفح</th>';
+  html += '</tr></thead><tbody>';
+  studentsArr.sort((a, b) => {
+    if (a.count === 0 && b.count > 0) return 1;
+    if (b.count === 0 && a.count > 0) return -1;
+    return b.count - a.count;
+  });
+  studentsArr.forEach(p => {
+    const s = p.student;
+    if (p.count > 0) {
+      html += '<tr>' +
+        '<td><span style="font-weight:700;">' + s.display_name + '</span></td>' +
+        '<td><span style="font-size:12px;color:#64748b;direction:ltr;display:inline-block;">' + s.uid + '</span></td>' +
+        '<td><span class="badge-success">' + p.count + ' مرة</span></td>' +
+        '<td style="font-size:12px;color:#64748b;">' + fmtDateTime(p.first) + '</td>' +
+        '<td style="font-size:12px;color:#64748b;">' + fmtDateTime(p.last) + '</td>' +
+        '<td>' + Array.from(p.devices).map(d => '<span class="badge-device">' + deviceLabel(d) + '</span>').join(' ') + '</td>' +
+        '<td>' + Array.from(p.browsers).map(b => '<span class="badge-device">' + b + '</span>').join(' ') + '</td>' +
+      '</tr>';
+    } else {
+      html += '<tr style="opacity:0.7;">' +
+        '<td>' + s.display_name + '</td>' +
+        '<td><span style="font-size:12px;color:#64748b;direction:ltr;display:inline-block;">' + s.uid + '</span></td>' +
+        '<td><span class="badge-not-yet">لم يدخل بعد</span></td>' +
+        '<td colspan="4" style="color:#94a3b8;">—</td>' +
+      '</tr>';
+    }
+  });
+  html += '</tbody></table></div></div>';
+
+  const absentList = studentsArr.filter(p => p.count === 0);
+  if (absentList.length > 0) {
+    html += '<div class="activity-section"><h3>الطلبة الذين لم يدخلوا بعد (' + absentList.length + ')</h3><div>';
+    absentList.forEach(p => {
+      html += '<span class="absent-pill">' + p.student.display_name + ' (' + p.student.uid + ')</span>';
+    });
+    html += '</div></div>';
+  }
+
+  if (failedRows.length > 0) {
+    html += '<div class="activity-section"><h3>محاولات الدخول الفاشلة (' + failedRows.length + ')</h3>';
+    html += '<div style="overflow-x:auto;"><table class="activity-table"><thead><tr>';
+    html += '<th>الوقت</th><th>الرقم المحاول</th><th>الجهاز</th><th>المتصفح</th>';
+    html += '</tr></thead><tbody>';
+    failedRows.slice().reverse().forEach(r => {
+      html += '<tr>' +
+        '<td style="font-size:12px;color:#64748b;">' + fmtDateTime(r.timestamp) + '</td>' +
+        '<td><span style="font-family:monospace;background:#fef2f2;color:#991b1b;padding:2px 8px;border-radius:4px;">' + (r.attemptedUid || '?') + '</span></td>' +
+        '<td><span class="badge-device">' + deviceLabel(r.device) + '</span></td>' +
+        '<td><span class="badge-device">' + (r.browser || '-') + '</span></td>' +
+      '</tr>';
+    });
+    html += '</tbody></table></div></div>';
+  }
+
+  html += '<div class="activity-section"><h3>سجل التسجيلات الكامل (' + rows.length + ')</h3>';
+  if (rows.length === 0) {
+    html += '<div class="empty-msg">لا توجد تسجيلات دخول بعد. شارك الرابط مع الطلبة.</div>';
+  } else {
+    html += '<div class="activity-log-list">';
+    rows.slice().reverse().forEach(r => {
+      const isSuccess = r.status === 'success';
+      const name = r.name || '(غير معروف)';
+      const uid = r.uid || r.attemptedUid || '?';
+      html += '<div class="log-row">' +
+        '<div class="time">' + fmtDateTime(r.timestamp) + '<br><span style="font-size:10px;color:#94a3b8;">' + timeAgo(r.timestamp) + '</span></div>' +
+        '<div class="who">' + name + ' <span class="uid-small">' + uid + '</span><br><span style="font-size:11px;color:#94a3b8;font-weight:400;">' + deviceLabel(r.device) + ' · ' + (r.browser || '-') + '</span></div>' +
+        '<div>' + (isSuccess ? '<span class="badge-success">ناجح</span>' : '<span class="badge-fail">فاشل</span>') + '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  document.getElementById('activity-content').innerHTML = html;
+}
+
+function initDashboard() {
+  const list = Object.values(STUDENTS_DATA);
+  const count = list.length;
+  const avg = list.reduce((s, x) => s + x.percent, 0) / count;
+  const avgPoints = list.reduce((s, x) => s + x.score, 0) / count;
+  const sorted = [...list].sort((a, b) => b.percent - a.percent);
+  const top = sorted[0];
+  const bot = sorted[sorted.length - 1];
+  const passCount = list.filter(x => x.percent >= 60).length;
+  const failCount = count - passCount;
+
+  document.getElementById('stat-count').textContent = count;
+  document.getElementById('stat-avg').textContent = avg.toFixed(1) + '%';
+  document.getElementById('stat-avg-points').textContent = avgPoints.toFixed(2) + ' / 20';
+  document.getElementById('stat-max').textContent = top.score;
+  document.getElementById('stat-max-name').textContent = top.display_name;
+  document.getElementById('stat-min').textContent = bot.score;
+  document.getElementById('stat-min-name').textContent = bot.display_name;
+  document.getElementById('stat-pass').textContent = passCount;
+  document.getElementById('stat-fail').textContent = failCount;
+
+  const tiers = [
+    { name: 'ممتاز (90-100%)', color: '#16a34a', count: list.filter(x => x.percent >= 90).length },
+    { name: 'جيد جداً (80-89%)', color: '#2563eb', count: list.filter(x => x.percent >= 80 && x.percent < 90).length },
+    { name: 'جيد (70-79%)', color: '#0891b2', count: list.filter(x => x.percent >= 70 && x.percent < 80).length },
+    { name: 'مقبول (60-69%)', color: '#ea580c', count: list.filter(x => x.percent >= 60 && x.percent < 70).length },
+    { name: 'راسب (<60%)', color: '#dc2626', count: list.filter(x => x.percent < 60).length },
+  ];
+  const dc = document.getElementById('dist-chart');
+  dc.innerHTML = '';
+  const maxC = Math.max(...tiers.map(t => t.count), 1);
+  tiers.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'dist-row';
+    const pct = (t.count / maxC) * 100;
+    row.innerHTML =
+      '<div class="dist-label">' + t.name + '</div>' +
+      '<div class="dist-bar"><div class="dist-fill" style="width:0%;background:' + t.color + ';">' + (t.count > 0 ? t.count : '') + '</div></div>' +
+      '<div class="dist-count">' + t.count + ' / ' + count + '</div>';
+    dc.appendChild(row);
+    setTimeout(() => {
+      row.querySelector('.dist-fill').style.width = pct + '%';
+    }, 100);
+  });
+
+  renderTable();
+  loadActivity();
+}
+
+function renderTable() {
+  const search = document.getElementById('search').value.toLowerCase().trim();
+  const filterTier = document.getElementById('filter-tier').value;
+  const sortBy = document.getElementById('sort-by').value;
+
+  let list = Object.values(STUDENTS_DATA);
+
+  if (search) {
+    list = list.filter(s =>
+      s.display_name.toLowerCase().includes(search) ||
+      s.official_name.toLowerCase().includes(search) ||
+      s.uid.includes(search)
+    );
+  }
+  if (filterTier) {
+    list = list.filter(s => s.tier === filterTier);
+  }
+  if (sortBy === 'rank') {
+    list.sort((a, b) => b.percent - a.percent);
+  } else if (sortBy === 'name') {
+    list.sort((a, b) => a.display_name.localeCompare(b.display_name, 'ar'));
+  } else if (sortBy === 'uid') {
+    list.sort((a, b) => a.uid.localeCompare(b.uid));
+  }
+
+  const ranked = [...Object.values(STUDENTS_DATA)].sort((a, b) => b.percent - a.percent);
+  const rankMap = {};
+  ranked.forEach((s, i) => rankMap[s.uid] = i + 1);
+
+  const body = document.getElementById('table-body');
+  body.innerHTML = '';
+  list.forEach((s) => {
+    const rank = rankMap[s.uid];
+    const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><span class="rank ' + rankClass + '">' + rank + '</span></td>' +
+      '<td><div class="student-name">' + s.display_name + '</div><div style="font-size:12px;color:#94a3b8;">' + s.official_name + '</div></td>' +
+      '<td><span class="uid">' + s.uid + '</span></td>' +
+      '<td><span class="score-pill" style="background:' + s.tier_color + '20;color:' + s.tier_color + '">' + s.score + ' / ' + s.total + '</span></td>' +
+      '<td style="font-weight:900;">' + s.percent.toFixed(1) + '%</td>' +
+      '<td><span class="tier-pill" style="background:' + s.tier_color + '">' + s.tier + '</span></td>' +
+      '<td><div class="actions-cell">' +
+        '<button class="icon-btn view" onclick="showStudent(\'' + s.uid + '\')" title="عرض التفاصيل">👁</button>' +
+        '<a href="reports/' + s.uid + '_report.pdf" download class="icon-btn pdf" title="تحميل PDF">📄</a>' +
+        '<a href="reports/' + s.uid + '_report.docx" download class="icon-btn docx" title="تحميل Word">📝</a>' +
+        '<a href="reports/' + s.uid + '_answer.pdf" download class="icon-btn answer" title="ورقة الاجابة">📋</a>' +
+      '</div></td>';
+    body.appendChild(tr);
+  });
+
+  if (list.length === 0) {
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">لا توجد نتائج تطابق البحث</td></tr>';
+  }
+}
+
+function statusClass(status) {
+  if (status.includes('صحيحة')) return 'status-correct';
+  return 'status-wrong';
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML.replace(/\n/g, '<br>');
+}
+
+function showStudent(uid) {
+  const s = STUDENTS_DATA[uid];
+  document.getElementById('modal-title').textContent = s.display_name + ' - ' + s.uid;
+
+  const circumference = 2 * Math.PI * 56;
+  const dash = (circumference * s.percent / 100);
+
+  let bd = '<div class="modal-grade-row">' +
+    '<div class="modal-circle"><svg viewBox="0 0 130 130">' +
+      '<circle cx="65" cy="65" r="56" fill="none" stroke="#f1f5f9" stroke-width="10"/>' +
+      '<circle cx="65" cy="65" r="56" fill="none" stroke="' + s.tier_color + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + dash + ' ' + circumference + '"/>' +
+    '</svg><div class="text-overlay"><div class="percent">' + s.percent.toFixed(1) + '%</div><div class="of">' + s.score + ' / ' + s.total + '</div></div></div>' +
+    '<div><div style="font-size:14px;color:#64748b;margin-bottom:4px;">الاسم الرسمي:</div><div style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:14px;">' + s.official_name + '</div>' +
+    '<span class="tier-pill" style="background:' + s.tier_color + ';font-size:14px;padding:6px 18px;">' + s.tier + '</span></div></div>';
+
+  bd += '<div class="modal-section"><h3>توزيع الدرجة على الاقسام</h3><div class="breakdown-grid-modal">';
+  s.sections.forEach(sec => {
+    bd += '<div class="breakdown-modal"><div class="name">' + sec.name + '</div><div><span class="val">' + sec.score + '</span> <span class="of">/ ' + sec.max + '</span></div></div>';
+  });
+  bd += '</div></div>';
+
+  bd += '<div class="modal-section"><h3>ملاحظات وتوصيات</h3><div class="notes-box">' + escapeHtml(s.notes) + '</div></div>';
+
+  bd += '<div class="modal-section"><h3>التصحيح التفصيلي - سؤال سؤال</h3><div style="overflow-x:auto;"><table class="qtable"><thead><tr>' +
+    '<th>السؤال</th><th>الاجابة الصحيحة</th><th>الحالة</th><th>الدرجة</th><th>الملاحظة</th></tr></thead><tbody>';
+  s.questions.forEach(q => {
+    bd += '<tr><td><span class="q-badge2">' + q.q + '</span></td>' +
+      '<td style="font-family:Consolas,monospace;font-size:12px;">' + escapeHtml(q.correct) + '</td>' +
+      '<td><span class="' + statusClass(q.status) + '">' + q.status + '</span></td>' +
+      '<td style="font-weight:700;">' + q.score + '</td>' +
+      '<td style="color:#475569;font-size:12px;">' + escapeHtml(q.note) + '</td></tr>';
+  });
+  bd += '</tbody></table></div></div>';
+
+  bd += '<div class="modal-actions">' +
+    '<a href="reports/' + s.uid + '_report.pdf" download class="btn btn-primary">⬇ تحميل التقرير PDF</a>' +
+    '<a href="reports/' + s.uid + '_report.docx" download class="btn btn-secondary">⬇ Word</a>' +
+    '<a href="reports/' + s.uid + '_answer.pdf" download class="btn btn-secondary">⬇ ورقة الاجابة</a>' +
+    '</div>';
+
+  document.getElementById('modal-body').innerHTML = bd;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+if (sessionStorage.getItem('admin_logged') === '1') {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('dashboard').classList.add('active');
+  initDashboard();
+} else {
+  document.getElementById('pwd').focus();
+}
+</script>
+</body>
+</html>
