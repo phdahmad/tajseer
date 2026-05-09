@@ -834,11 +834,11 @@ function doLogout() {
 }
 
 // ===== Login Activity =====
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2rljF8PAZzJYqVf8Zk2uEhvyrM56_jWh7kbBV1WF0Jnfb0cJfuSUb6ZvQuKrgHoXlbA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzc95nPFn0pDYtNgmEVCVuwUIScAVOllluy7wEqHlR55ZOtoHnipR9Sh5qmew1oVgB6PQ/exec";
 
 let activityRows = null;
 
-async function loadActivity() {
+function loadActivity() {
   const container = document.getElementById('activity-content');
   const refreshIcon = document.getElementById('refresh-icon');
   const refreshBtn = document.getElementById('refresh-activity');
@@ -847,19 +847,44 @@ async function loadActivity() {
 
   container.innerHTML = '<div class="activity-loading">جار تحميل بيانات الدخول...</div>';
 
-  try {
-    const url = SCRIPT_URL + '?password=' + encodeURIComponent(PASSWORD);
-    const res = await fetch(url, { method: 'GET', redirect: 'follow' });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'unknown error');
-    activityRows = data.rows || [];
-    renderActivity();
-  } catch (err) {
-    container.innerHTML = '<div class="activity-error"><b>خطأ في الاتصال:</b> ' + err.message + '<br><small>تأكد من ان السكربت منشور على Google Apps Script ومن صحة كلمة السر.</small></div>';
-  } finally {
+  // JSONP approach to bypass CORS restrictions
+  const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  let timeoutId = null;
+
+  const cleanup = () => {
+    try { delete window[callbackName]; } catch(e) { window[callbackName] = undefined; }
+    if (timeoutId) clearTimeout(timeoutId);
+    if (script.parentNode) script.parentNode.removeChild(script);
     refreshBtn.classList.remove('spinning');
     refreshIcon.textContent = '↻';
-  }
+  };
+
+  window[callbackName] = function(data) {
+    cleanup();
+    if (!data || !data.ok) {
+      const errMsg = (data && data.error) ? data.error : 'استجابة غير صالحة';
+      container.innerHTML = '<div class="activity-error"><b>خطأ من السيرفر:</b> ' + errMsg + '<br><small>تأكد من كلمة السر في Apps Script.</small></div>';
+      return;
+    }
+    activityRows = data.rows || [];
+    renderActivity();
+  };
+
+  const script = document.createElement('script');
+  script.src = SCRIPT_URL + '?password=' + encodeURIComponent(PASSWORD) + '&callback=' + callbackName + '&t=' + Date.now();
+  script.onerror = function() {
+    cleanup();
+    container.innerHTML = '<div class="activity-error"><b>خطأ في الاتصال بـ Google Apps Script.</b><br><small>تأكد من ان السكربت منشور وأن الإصدار الأخير يدعم callback (JSONP). راجع التعليمات في README.</small></div>';
+  };
+
+  timeoutId = setTimeout(function() {
+    if (window[callbackName]) {
+      cleanup();
+      container.innerHTML = '<div class="activity-error"><b>انتهت المهلة بدون استجابة.</b><br><small>السيرفر لم يرد خلال 15 ثانية. حاول مرة اخرى.</small></div>';
+    }
+  }, 15000);
+
+  document.head.appendChild(script);
 }
 
 function fmtDateTime(iso) {
